@@ -1,0 +1,261 @@
+/* Grundlegende Reset */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    color: #333333;
+}
+
+/* Header */
+header {
+    background-color: #f4f4f4;
+    padding: 20px;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333333;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #f8b400;
+}
+
+h1 {
+    margin: 0;
+    color: #f8b400;
+}
+
+/* Hauptbereich */
+main {
+    padding: 120px 20px 20px;
+}
+
+/* Menü-Styling */
+.menu-item {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #333333;
+    display: flex;
+    align-items: center;
+    max-width: 650px;
+    width: 100%;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    background-color: #f9f9f9;
+}
+
+.pizza-image {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.menu-item-content {
+    margin-left: 15px;
+    flex-grow: 1;
+}
+
+.menu-item h3 {
+    margin: 0 0 10px 0;
+    color: #f8b400;
+}
+
+.menu-item p {
+    margin: 0 0 10px 0;
+    color: #666666;
+}
+
+.price {
+    font-weight: bold;
+    color: #f8b400;
+}
+
+.order-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.order-button:hover {
+    background-color: #218838;
+}
+
+/* Warenkorb */
+#cart {
+    background-color: #fff;
+    border: 2px solid #f8b400;
+    border-radius: 8px;
+    padding: 20px;
+    width: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    right: 20px;
+    top: 120px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, visibility 0s 0.3s;
+    z-index: 1100;
+    font-family: 'Arial', sans-serif;
+}
+
+#cart.show {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#cart h2 {
+    margin-top: 0;
+    color: #f8b400;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#cart-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#cart-items li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* X-Button für den Warenkorb */
+.remove-item {
+    width: auto;
+    padding: 5px 10px;
+    font-size: 14px;
+    background: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.remove-item:hover {
+    background: darkred;
+}
+
+/* Formular-Styling */
+form {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form h2 {
+    text-align: center;
+    color: #333;
+}
+
+form label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+}
+
+input, button {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+}
+
+input[type="text"], input[type="email"], input[type="tel"] {
+    background-color: #f8f8f8;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: auto;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Gesamtpreis im Formular */
+#cart-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+#cart-summary #total-price {
+    color: #f8b400;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #f4f4f4;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: 30px;
+}
+
+
