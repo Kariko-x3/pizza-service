@@ -1,96 +1,144 @@
-// Warenkorb Daten aus localStorage abrufen oder leeres Array
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+// Warten, bis der DOM vollständig geladen ist, bevor das Skript ausgeführt wird
+document.addEventListener("DOMContentLoaded", () => {
+    // Debugging-Nachricht, die anzeigt, dass das Skript geladen wurde
+    console.log("✅ cart.js geladen");
 
-// Warenkorb anzeigen
-function displayCart() {
+    // Warenkorb aus dem localStorage laden, wenn vorhanden, ansonsten ein leeres Array
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // Container für die Anzeige der Warenkorb-Artikel und des Gesamtpreises
     const cartItemsContainer = document.getElementById("cart-items");
     const totalPriceContainer = document.getElementById("total-price");
-    cartItemsContainer.innerHTML = "";
 
-    let totalPrice = 0;
+    // Funktion zum Anzeigen des Warenkorbs
+    function displayCart() {
+        // Wenn die Container-Elemente nicht gefunden wurden, wird eine Fehlermeldung angezeigt
+        if (!cartItemsContainer || !totalPriceContainer) {
+            console.error("❌ Fehler: 'cart-items' oder 'total-price' nicht gefunden!");
+            return;
+        }
 
-    cart.forEach(item => {
-        const itemElement = document.createElement("div");
-        itemElement.classList.add("cart-item");
-        itemElement.innerHTML = `
-            <p>${item.name} - ${item.price.toFixed(2)} €</p>
-            <button onclick="removeItem('${item.name}')">Entfernen</button>
-        `;
-        cartItemsContainer.appendChild(itemElement);
-        totalPrice += item.price;
-    });
+        // Warenkorb zurücksetzen (leeren), bevor neue Inhalte hinzugefügt werden
+        cartItemsContainer.innerHTML = "";
 
-    totalPriceContainer.innerText = totalPrice.toFixed(2);
-}
+        // Variable für den Gesamtpreis initialisieren
+        let totalPrice = 0;
 
-// Artikel aus dem Warenkorb entfernen
-function removeItem(itemName) {
-    cart = cart.filter(item => item.name !== itemName);
-    localStorage.setItem("cart", JSON.stringify(cart));
+        // Durch den Warenkorb iterieren, um jeden Artikel anzuzeigen
+        cart.forEach((item, index) => {
+            // Preis zum Gesamtpreis hinzufügen
+            totalPrice += item.price;
+
+            // Ein neues Listenelement für den Artikel erstellen
+            const li = document.createElement("li");
+            li.innerHTML = `${item.name} - ${item.price.toFixed(2)} € 
+                <button class="remove-item" data-index="${index}">X</button>`;
+            cartItemsContainer.appendChild(li);
+        });
+
+        // Debugging-Nachricht, um den Gesamtpreis anzuzeigen
+        console.log("📊 Gesamtpreis berechnet:", totalPrice);
+
+        // Gesamtpreis im Container anzeigen
+        totalPriceContainer.textContent = totalPrice.toFixed(2);
+
+        // Alle Entfernen-Schaltflächen ("X") im Warenkorb mit Event-Listenern versehen
+        document.querySelectorAll(".remove-item").forEach(button => {
+            button.addEventListener("click", function () {
+                // Artikelindex aus dem Button-Attribut holen
+                const index = this.getAttribute("data-index");
+
+                // Artikel aus dem Warenkorb entfernen
+                cart.splice(index, 1);
+
+                // Den Warenkorb im localStorage speichern
+                localStorage.setItem("cart", JSON.stringify(cart));
+
+                // Warenkorb neu anzeigen
+                displayCart();
+            });
+        });
+    }
+
+    // Die Funktion `displayCart()` aufrufen, um den Warenkorb sofort anzuzeigen
     displayCart();
-}
 
-// Bestellung abschließen
-document.getElementById("order-form").addEventListener("submit", function(event) {
-    event.preventDefault(); // Verhindert das Standardformularabsenden
+    // 🛒 Wenn das Bestellformular abgeschickt wird, wird dieser Event-Listener ausgeführt
+    document.getElementById("order-form").addEventListener("submit", function (event) {
+        // Verhindern, dass das Formular standardmäßig abgeschickt wird
+        event.preventDefault();
 
-    if (cart.length === 0) {
-        alert("Ihr Warenkorb ist leer!");
-        return;
-    }
+        // Überprüfen, ob der Warenkorb leer ist, und eine Fehlermeldung anzeigen, falls ja
+        if (cart.length === 0) {
+            alert("❌ Ihr Warenkorb ist leer!");
+            return;
+        }
 
-    // Eingabewerte des Formulars
-    const customerName = document.getElementById("name").value.trim();
-    const customerSurname = document.getElementById("surname").value.trim();
-    const customerAddress = document.getElementById("address").value.trim();
-    const customerPhone = document.getElementById("phone").value.trim();
-    const customerEmail = document.getElementById("email").value.trim();
+        // Eingabefelder für Kundeninformationen auslesen und trimmen (Whitespace entfernen)
+        const customerName = document.getElementById("full-name").value.trim();
+        const customerAddress = document.getElementById("street").value.trim() + " " +
+                                document.getElementById("house-number").value.trim();
+        const customerPhone = document.getElementById("phone").value.trim();
+        const customerEmail = document.getElementById("email").value.trim();
 
-    // Validierung der Eingaben
-    let valid = true;
-    let errorMessages = [];
+        // Gesamtpreis aus dem Textinhalt des totalPriceContainer holen
+        const totalPrice = totalPriceContainer.textContent.replace(" €", "");
 
-    if (!customerName || !customerSurname || !customerAddress || !customerEmail) {
-        errorMessages.push("Bitte füllen Sie alle erforderlichen Felder aus.");
-        valid = false;
-    }
+        // Überprüfen, ob alle erforderlichen Felder ausgefüllt sind
+        if (!customerName || !customerAddress || !customerEmail) {
+            alert("❌ Bitte füllen Sie alle Pflichtfelder aus.");
+            return;
+        }
 
-    if (valid) {
+        // Die Bestellinformationen in einem Objekt speichern
         const orderData = {
             name: customerName,
-            surname: customerSurname,
             address: customerAddress,
             phone: customerPhone,
             email: customerEmail,
-            order: JSON.stringify(cart),
-            total: document.getElementById("total-price").innerText
+            order: JSON.stringify(cart), // Den Warenkorb als JSON speichern
+            total: totalPrice
         };
 
-        // Bestellung an Server senden
+        // Debugging-Nachricht, um die Bestelldaten anzuzeigen
+        console.log("📩 Bestellung wird gesendet:", orderData);
+
+        // Bestellung an den Server senden
         fetch("/order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(orderData)
+            method: "POST", // HTTP-Methoden: POST zum Absenden von Daten
+            headers: { "Content-Type": "application/json" }, // Senden von JSON-Daten
+            body: JSON.stringify(orderData) // Die Bestelldaten als JSON im Body des Requests
         })
-        .then(response => response.json())
+        .then(response => response.json()) // Serverantwort als JSON parsen
         .then(data => {
+            // Serverantwort anzeigen
+            console.log("📨 Server-Antwort:", data);
+
+            // Wenn eine Nachricht von der Serverantwort existiert, wurde die Bestellung erfolgreich abgeschickt
             if (data.message) {
-                alert("Bestellung erfolgreich!");
+                alert("✅ Bestellung erfolgreich abgeschickt!");
+
+                // Warenkorb aus dem localStorage entfernen, nachdem die Bestellung abgeschickt wurde
                 localStorage.removeItem("cart");
+
+                // Zur Startseite weiterleiten
                 window.location.href = "/";
             } else {
-                alert("Fehler: " + data.error);
+                // Fehlermeldung vom Server anzeigen
+                alert("❌ Fehler: " + data.error);
             }
         })
         .catch(error => {
-            alert("Fehler beim Bestellvorgang: " + error);
+            // Fehlerbehandlung, falls der Fetch-Aufruf fehlschlägt
+            alert("❌ Fehler beim Absenden der Bestellung: " + error);
         });
-    } else {
-        alert(errorMessages.join("\n"));
-    }
+    });
 });
 
-// Initiale Anzeige des Warenkorbs
-displayCart();
+
+
+
+
+
 
 
